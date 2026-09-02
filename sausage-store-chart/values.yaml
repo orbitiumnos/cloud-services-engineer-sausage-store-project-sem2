@@ -1,5 +1,9 @@
 global:
   imagePullPolicy: Always
+  ###vault:
+  ###  host: ip
+  ###  name: vault
+  ###  vaultToken: someToken
   mongodb:
     reports:
       database: sausage-store
