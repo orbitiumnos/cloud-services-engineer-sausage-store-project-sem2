@@ -11,7 +11,8 @@ RUN npm ci --no-audit --no-fund && \
 
 COPY . .
 
-RUN npm run build -- --prod
+#RUN npm run build -- --prod
+RUN npm run build -- -c production
 
 # копирование в образ nginx
 
