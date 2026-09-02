@@ -110,10 +110,10 @@ jobs:
           uses: azure/setup-helm@v4
         - name: Setup kubeconfig
           run: |
-            mkdir -p ~/.kube
-            echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
-            chmod 600 ~/.kube/config
-#            echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
+#            mkdir -p ~/.kube
+#            echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+#            chmod 600 ~/.kube/config
+            echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > kubeconfig
         - name: Add Nexus Helm repo
           run: |
             helm repo add nexus ${{ env.NEXUS_HELM_REPO }} \
