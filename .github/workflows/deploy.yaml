@@ -14,7 +14,7 @@ env:
   SAUSAGE_STORE_NAMESPACE: ${{ secrets.NAMESPACE }}
   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
   VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
-  CHART_VERSION: "0.1"
+  CHART_VERSION: 0.2
 
 jobs:
   # Сборка и пуш образов в докерхаб:
@@ -109,7 +109,11 @@ jobs:
         - name: Install Helm
           uses: azure/setup-helm@v4
         - name: Setup kubeconfig
-          run: echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
+          run: |
+            mkdir -p ~/.kube
+            echo "${{ secrets.KUBE_CONFIG }}" > ~/.kube/config
+            chmod 600 ~/.kube/config
+#            echo "${{ secrets.KUBE_CONFIG }}" | base64 -d > kubeconfig
         - name: Add Nexus Helm repo
           run: |
             helm repo add nexus ${{ env.NEXUS_HELM_REPO }} \
