@@ -29,9 +29,6 @@ spec:
     matchLabels:
       app: postgresql
   template:
-    metadata:
-      labels:
-        app: postgresql
     spec:
       containers:
         - name: postgresql
@@ -54,7 +51,9 @@ spec:
             limits:
               cpu: "500m"
               memory: "512Mi"
-#            {{- toYaml .Values.postgresql.resources | nindent 12 }}
+    metadata:
+      labels:
+        app: postgresql
   volumeClaimTemplates:
     - metadata:
         name: postgresql-data
