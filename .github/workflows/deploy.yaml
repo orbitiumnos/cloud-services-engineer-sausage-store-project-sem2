@@ -53,16 +53,12 @@ jobs:
             tags: ${{ env.DOCKER_USER }}/sausage-backend:latest
             build-args: |
               VERSION=${{ github.sha }}
-            cache-from: type=gha
-            cache-to: type=gha,mode=max
         - name: Push Frontend to DockerHub
           uses: docker/build-push-action@v5
           with:
             context: ./frontend/
             push: true
             tags: ${{ env.DOCKER_USER }}/sausage-frontend:latest
-            cache-from: type=gha
-            cache-to: type=gha,mode=max
         - name: Push Backend-report to DockerHub
           uses: docker/build-push-action@v4
           with:
