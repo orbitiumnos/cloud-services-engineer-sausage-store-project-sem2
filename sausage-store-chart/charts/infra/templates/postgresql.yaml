@@ -48,7 +48,7 @@ spec:
             - name: postgresql-data
               mountPath: /var/lib/postgresql/data
           resources:
-{{ toYaml .Values.postgresql.resources | indent 12 }}
+            {{- toYaml .Values.postgresql.resources | nindent 12 }}
   volumeClaimTemplates:
     - metadata:
         name: postgresql-data
@@ -56,7 +56,7 @@ spec:
         accessModes: [ "ReadWriteOnce" ]
         resources:
           requests:
-            storage: {{ .Values.postgresql.storage }}
+            storage: "{{ .Values.postgresql.storage }}"
 ---
 apiVersion: v1
 kind: Service
