@@ -35,25 +35,12 @@ spec:
           image: {{ .Values.postgresql.image }}
           ports:
             - containerPort: {{ .Values.postgresql.containerPort }}
-          envFrom:
-            - secretRef:
-                name: postgresql-secret
-          env:
-            - name: PGDATA
-              value: /var/lib/postgresql/data/pgdata
+          resources:
+{{ toYaml .Values.postgresql.resources | indent 12 }}
           volumeMounts:
             - name: postgresql-data
               mountPath: /var/lib/postgresql/data
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "128Mi"
-            limits:
-              cpu: "500m"
-              memory: "512Mi"
-    metadata:
-      labels:
-        app: postgresql
+              subPath: data
   volumeClaimTemplates:
     - metadata:
         name: postgresql-data
@@ -71,9 +58,10 @@ metadata:
   labels:
     app: postgresql
 spec:
-  clusterIP: None
+  type: ClusterIP
   ports:
     - port: {{ .Values.postgresql.containerPort }}
       targetPort: {{ .Values.postgresql.containerPort }}
+      protocol: TCP
   selector:
     app: postgresql
