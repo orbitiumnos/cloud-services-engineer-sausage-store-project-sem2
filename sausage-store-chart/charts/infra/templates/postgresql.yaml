@@ -42,30 +42,19 @@ spec:
       containers:
         - name: postgresql
           image: {{ .Values.postgresql.image }}
-          env:
-            - name: POSTGRES_DB
-              valueFrom:
-                configMapKeyRef:
-                  name: postgresql-conf
-                  key: POSTGRES_DB
-            - name: POSTGRES_USER
-              valueFrom:
-                configMapKeyRef:
-                  name: postgresql-conf
-                  key: POSTGRES_USER
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: postgresql-secret
-                  key: POSTGRES_PASSWORD
           ports:
             - containerPort: {{ .Values.postgresql.containerPort }}
-          resources:
-{{ toYaml .Values.postgresql.resources | indent 12 }}
+          envFrom:
+            - secretRef:
+                name: postgresql-secret
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
           volumeMounts:
             - name: postgresql-data
               mountPath: /var/lib/postgresql/data
-              subPath: data
+          resources:
+{{ toYaml .Values.postgresql.resources | indent 12 }}
   volumeClaimTemplates:
     - metadata:
         name: postgresql-data
