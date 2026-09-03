@@ -14,7 +14,7 @@ env:
   SAUSAGE_STORE_NAMESPACE: ${{ secrets.NAMESPACE }}
   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
   VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
-  CHART_VERSION: 0.7
+  CHART_VERSION: 0.9
 
 jobs:
   # Сборка и пуш образов в докерхаб:
@@ -123,3 +123,4 @@ jobs:
               --namespace ${{ env.SAUSAGE_STORE_NAMESPACE }} \
               --values ./values-resolved.yaml \
               --kubeconfig ./kubeconfig
+              --timeout 20m0s
