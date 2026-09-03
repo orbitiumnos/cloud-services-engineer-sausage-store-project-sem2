@@ -26,11 +26,11 @@ spec:
                   name: mongodb-conf
                   key: MONGO_INITDB_ROOT_PASSWORD
             - name: REPORTS_DB
-              value: { { .Values.mongodb.reports.database } }
+              value: {{ .Values.mongodb.reports.database }}
             - name: REPORTS_USER
-              value: { { .Values.mongodb.reports.user } }
+              value: {{ .Values.mongodb.reports.user }}
             - name: REPORTS_PASSWORD
-              value: { { .Values.mongodb.reports.password } }
+              value: {{ .Values.mongodb.reports.password }}
           resources:
             requests:
               cpu: "100m"
@@ -39,18 +39,20 @@ spec:
               cpu: "200m"
               memory: "256Mi"
           command:
-          - /bin/bash
-          - -c
-          - |
-            mongo --host mongodb -u "$MONGO_ROOT_USER" -p "$MONGO_ROOT_PASSWORD" --authenticationDatabase admin sausage-store --eval "
-              if (db.getUser(\"$MONGO_APP_USER\") == null) {
-                db.createUser({user: \"$MONGO_APP_USER\", pwd: \"$MONGO_APP_PASSWORD\", roles: [{ role: \"readWrite\", db: \"sausage-store\" }]});
-                print(\"user created\");
-              } else {
-                db.updateUser(\"$MONGO_APP_USER\", {pwd: \"$MONGO_APP_PASSWORD\", roles: [{ role: \"readWrite\", db: \"sausage-store\" }]});
-                print(\"user already exists, updated\");
-              }
-            "
+            - /bin/bash
+            - -c
+            - |
+              mongo --host mongodb -u "$MONGO_ROOT_USER" -p "$MONGO_ROOT_PASSWORD" --authenticationDatabase admin sausage-store --eval "
+                if (db.getUser(\"$MONGO_APP_USER\") == null) {
+                  db.createUser({user: \"$MONGO_APP_USER\", pwd: \"$MONGO_APP_PASSWORD\", roles: [{ role: \"readWrite\", db: \"sausage-store\" }]});
+                  print(\"user created\");
+                } else {
+                  db.updateUser(\"$MONGO_APP_USER\", {pwd: \"$MONGO_APP_PASSWORD\", roles: [{ role: \"readWrite\", db: \"sausage-store\" }]});
+                  print(\"user already exists, updated\");
+                }
+              "
+
+
 #          command:
 #            - sh
 #            - -c
