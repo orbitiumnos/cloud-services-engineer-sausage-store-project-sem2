@@ -13,41 +13,7 @@ spec:
       restartPolicy: OnFailure
       containers:
         - name: mongo-client
-          image: {{ .Values.mongodb.image }}
-          resources:
-            requests:
-              cpu: "100m"
-              memory: "256Mi"
-            limits:
-              cpu: "200m"
-              memory: "256Mi"
-          command:
-            - sh
-            - -c
-            - |
-              echo "Waiting for MongoDB to become ready..."
-              until mongosh --host mongodb \
-                -u "$MONGO_INITDB_ROOT_USERNAME" \
-                -p "$MONGO_INITDB_ROOT_PASSWORD" \
-                --authenticationDatabase admin \
-                --eval "db.adminCommand('ping')" \
-                --quiet; do
-                echo "MongoDB not ready, waiting..."
-                sleep 5
-              done
-              echo "MongoDB is ready, creating user..."
-              mongosh --host mongodb \
-                -u "$MONGO_INITDB_ROOT_USERNAME" \
-                -p "$MONGO_INITDB_ROOT_PASSWORD" \
-                --authenticationDatabase admin <<EOF
-              db = db.getSiblingDB("$REPORTS_DB");
-              db.createUser({
-                user: "$REPORTS_USER",
-                pwd: "$REPORTS_PASSWORD",
-                roles: [{ role: "readWrite", db: "$REPORTS_DB" }]
-              });
-              EOF
-              echo "User created successfully."
+          image: mongo:5.0 #{{ .Values.mongodb.image }}
           env:
             - name: MONGO_INITDB_ROOT_USERNAME
               valueFrom:
@@ -60,8 +26,55 @@ spec:
                   name: mongodb-conf
                   key: MONGO_INITDB_ROOT_PASSWORD
             - name: REPORTS_DB
-              value: {{ .Values.mongodb.reports.database }}
+              value: { { .Values.mongodb.reports.database } }
             - name: REPORTS_USER
-              value: {{ .Values.mongodb.reports.user }}
+              value: { { .Values.mongodb.reports.user } }
             - name: REPORTS_PASSWORD
-              value: {{ .Values.mongodb.reports.password }}
+              value: { { .Values.mongodb.reports.password } }
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "200m"
+              memory: "256Mi"
+          command:
+          - /bin/bash
+          - -c
+          - |
+            mongo --host mongodb -u "$MONGO_ROOT_USER" -p "$MONGO_ROOT_PASSWORD" --authenticationDatabase admin sausage-store --eval "
+              if (db.getUser(\"$MONGO_APP_USER\") == null) {
+                db.createUser({user: \"$MONGO_APP_USER\", pwd: \"$MONGO_APP_PASSWORD\", roles: [{ role: \"readWrite\", db: \"sausage-store\" }]});
+                print(\"user created\");
+              } else {
+                db.updateUser(\"$MONGO_APP_USER\", {pwd: \"$MONGO_APP_PASSWORD\", roles: [{ role: \"readWrite\", db: \"sausage-store\" }]});
+                print(\"user already exists, updated\");
+              }
+            "
+#          command:
+#            - sh
+#            - -c
+#            - |
+#              echo "Waiting for MongoDB to become ready..."
+#              until mongosh --host mongodb \
+#                -u "$MONGO_INITDB_ROOT_USERNAME" \
+#                -p "$MONGO_INITDB_ROOT_PASSWORD" \
+#                --authenticationDatabase admin \
+#                --eval "db.adminCommand('ping')" \
+#                --quiet; do
+#                echo "MongoDB not ready, waiting..."
+#                sleep 5
+#              done
+#              echo "MongoDB is ready, creating user..."
+#              mongosh --host mongodb \
+#                -u "$MONGO_INITDB_ROOT_USERNAME" \
+#                -p "$MONGO_INITDB_ROOT_PASSWORD" \
+#                --authenticationDatabase admin <<EOF
+#              db = db.getSiblingDB("$REPORTS_DB");
+#              db.createUser({
+#                user: "$REPORTS_USER",
+#                pwd: "$REPORTS_PASSWORD",
+#                roles: [{ role: "readWrite", db: "$REPORTS_DB" }]
+#              });
+#              EOF
+#              echo "User created successfully."
