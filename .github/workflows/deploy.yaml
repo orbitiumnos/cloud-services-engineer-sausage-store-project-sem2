@@ -14,7 +14,7 @@ env:
   SAUSAGE_STORE_NAMESPACE: ${{ secrets.NAMESPACE }}
   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG }}
   VAULT_TOKEN: ${{ secrets.VAULT_TOKEN }}
-  CHART_VERSION: 0.4
+  CHART_VERSION: 0.5
 
 jobs:
   # Сборка и пуш образов в докерхаб:
